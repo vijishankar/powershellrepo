@@ -5,6 +5,8 @@
 #
 # Generated on: 05/06/2020
 #
+Write Host "Hii this is viji"
+
 
 @{
 
