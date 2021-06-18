@@ -24,5 +24,5 @@ jobs:
     steps:
       - task: PowerShell@2
         inputs:
-          filePath: '$(Pipeline.Workspace)/create_variable_group.ps1'
+          filePath: './create_variable_group.ps1'
           arguments: '-groupName ${{parameters.groupname}}'
