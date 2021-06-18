@@ -7,7 +7,7 @@
         [string]$project
     )
     
-Import-Module -Name $workspace/self/variables/scripts/VariableGroups.psd1 -Force
+Import-Module -Name ./VariableGroups.psd1 -Force
 Write-Host "Generation variables for path: $path"
 foreach ($file in Get-ChildItem -Path $path -Filter *.json*) {
 
