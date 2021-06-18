@@ -1,0 +1,20 @@
+trigger:
+- master
+pool:
+  vmImage: 'ubuntu-latest'
+parameters:
+- name: groupname
+  type: string
+  default: 'newGroup'
+
+- name: groupdesc
+  type: string
+  default: 'hi all'
+
+- name: variablename
+  type: string
+  default: 'Devops'
+
+- name: variablevalue
+  type: string
+  default: 'Joe'
