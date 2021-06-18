@@ -26,7 +26,7 @@ jobs:
         env:
           SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         inputs:
-          filePath: './create_variable_group.ps1'
+          filePath: './setvariables.ps1'
           arguments: 
               -workspace $(Pipeline.Workspace)
               -path ${{parameters.groupname}}
