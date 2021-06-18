@@ -23,6 +23,13 @@ jobs:
   - job: creating_group
     steps:
       - task: PowerShell@2
+        env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         inputs:
           filePath: './create_variable_group.ps1'
-          arguments: '-groupName ${{parameters.groupname}}'
+          arguments: 
+              -workspace $(Pipeline.Workspace)
+              -path ${{parameters.groupname}}
+              -bearerToken "$env:SYSTEM_ACCESSTOKEN"
+              -organization $(System.CollectionUri)
+              -project $(System.TeamProject)
