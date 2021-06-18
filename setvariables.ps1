@@ -6,7 +6,12 @@
         [string]$organization,
         [string]$project
     )
-    
+Write-Output $workspace
+Write-Output $path
+Write-Output $bearerToken
+Write-Output $organization
+Write-Output $project
+ 
 Import-Module -Name ./VariableGroups.psd1 -Force
 Write-Host "Generation variables for path: $path"
 foreach ($file in Get-ChildItem -Path $path -Filter *.json*) {
