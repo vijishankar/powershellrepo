@@ -24,7 +24,7 @@ jobs:
     steps:
       - task: PowerShell@2
         env:
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+          SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         inputs:
           filePath: './create_variable_group.ps1'
           arguments: 
