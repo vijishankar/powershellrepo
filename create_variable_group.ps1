@@ -1,6 +1,13 @@
 param (
-        [string]$groupName
+        [string]$workspace,
+        [string]$path,
+        [string]$bearerToken,
+        [string]$organization,
+        [string]$project,
     )
 
-Write-Host "hii this is viji"
-Write-Output $groupName
+Write-Output $workspace
+Write-Output $path
+Write-Output $bearerToken
+Write-Output $organization
+Write-Output $project
