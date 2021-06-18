@@ -3,7 +3,7 @@ param (
         [string]$path,
         [string]$bearerToken,
         [string]$organization,
-        [string]$project,
+        [string]$project
     )
 
 Write-Output $workspace
