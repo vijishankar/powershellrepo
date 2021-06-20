@@ -5,8 +5,8 @@
     "DR": "false",
     "pool": "CTS-Skinny",
     "dnsname": "ussaas.t24-jumpstart.com",
-    "group_name":"CTS - Skinny SaaS NE",
-    "group_desc":"CTS - Skinny SaaS NE primary variables",
+    "group_name":"VariableGroupYML",
+    "group_desc":"VariableGroupYML NE primary variables",
     "group_id": 27,
     "PREFIX":"SKNY", //uppercase A-Z short string. Max length = 9
     "prefix":"skny", //lowercase a-z short string. Max length = 9
