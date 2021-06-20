@@ -5,7 +5,7 @@ pool:
 parameters:
 - name: groupname
   type: string
-  default: 'newGroup'
+  default: './'
 
 - name: groupdesc
   type: string
