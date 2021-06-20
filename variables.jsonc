@@ -1,5 +1,5 @@
 {
-  "template":"./skinnysaas-variables.jsonc",
+  "template":"./variablesset.jsonc",
   "substitution":{
     "CLASS": "B",
     "DR": "false",
@@ -7,7 +7,7 @@
     "dnsname": "ussaas.t24-jumpstart.com",
     "group_name":"VariableGroupYML",
     "group_desc":"VariableGroupYML NE primary variables",
-    "group_id": 27,
+    "group_id": 7,
     "PREFIX":"SKNY", //uppercase A-Z short string. Max length = 9
     "prefix":"skny", //lowercase a-z short string. Max length = 9
     "subscription":"530da058-ec10-407e-adf2-f7e557e6315b",
