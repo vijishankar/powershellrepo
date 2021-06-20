@@ -141,7 +141,7 @@ function Update-VariableGroup {
 
     [Parameter(Mandatory = $true, parametersetname='Bearer')]
     [String]
-    $bearerToken = $(System.AccessToken),
+    $bearerToken,
 
     [Parameter(Mandatory = $false)]
     [String]
