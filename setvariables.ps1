@@ -19,7 +19,7 @@ foreach ($file in Get-ChildItem -Path $path -Filter variables.json*) {
     Write-Host "Merging and pushing primary variables for $file"
     $content = Get-Content -Path $file -Raw
     $variables = $content | ConvertFrom-Json -AsHashTable   
-    $template = Get-Content -Path "$workspace/self/$($variables.template)" -Raw
+    $template = Get-Content -Path "$workspace/self/1/s/$($variables.template)" -Raw
     foreach ($key in $variables.substitution.Keys) {
         $template = $template -creplace "<ToUpper\($key\)>", $variables.substitution[$key].ToString().ToUpper()
         $template = $template -creplace "<$key>", $variables.substitution[$key]
