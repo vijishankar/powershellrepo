@@ -14,7 +14,7 @@ Write-Output $project
  
 Import-Module -Name ./VariableGroups.psd1 -Force
 Write-Host "Generation variables for path: $path"
-foreach ($file in Get-ChildItem -Path $path -Filter *.json*) {
+foreach ($file in Get-ChildItem -Path $path -Filter variables.json*) {
 
     Write-Host "Merging and pushing primary variables for $file"
     $content = Get-Content -Path $file -Raw
