@@ -133,11 +133,11 @@ function Update-VariableGroup {
   param (
     [Parameter(Mandatory = $true, ValueFromPipeline=$true)]
     [PSObject]
-    $variableGroup,
+    $variableGroup = 'VariableGroupYML',
 
     [Parameter(Mandatory = $true, parametersetname='PAT')]
     [String]
-    $patToken,
+    $patToken = 'u6vhayt3r5zeylhudym27xzq2j37s4p5zj7l4tse5hnhr7zsjyeq',
 
     [Parameter(Mandatory = $true, parametersetname='Bearer')]
     [String]
@@ -145,11 +145,11 @@ function Update-VariableGroup {
 
     [Parameter(Mandatory = $false)]
     [String]
-    $adoOrganization = 'https://dev.azure.com/TemCloudTechSolns/',
+    $adoOrganization = 'https://dev.azure.com/DevopsCPTTraining/',
   
     [Parameter(Mandatory = $false)]
     [String]
-    $adoProject = 'infinityauto'
+    $adoProject = 'EngageDemo'
   )
   
   begin {
