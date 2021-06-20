@@ -21,8 +21,8 @@ foreach ($file in Get-ChildItem -Path $path -Filter variables.json*) {
     Write-Host $file
     $variables = $content | ConvertFrom-Json -AsHashTable   
     Write-Host $variables.template
-    $template = Get-Content -Path "$workspace/self/1/s/$($variables.template)" -Raw
-    
+    $template = Get-Content -Path "$workspace/$($variables.template)" -Raw
+    Write-Host $workspace
    # $template = Get-Content -Path $file | ConvertFrom-Json -AsHashTable
     
     foreach ($key in $variables.substitution.Keys) {
