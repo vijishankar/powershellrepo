@@ -85,18 +85,18 @@ jobs:
   - job: templates
     steps:
     - ${{if eq(parameters.primary, true)}}:
-    - template: ./coreresources.yml
-      parameters:
-      firstrun: ${{parameters.firstrun}}
-      secondary: ${{parameters.secondary}}
-      primary: true
-      variableGroup: 'VariableGroupYML'
-      envName: primary    
-      database: ${{parameters.database}} 
-      cleanAks: ${{parameters.cleanAks}}
-      dependsOn: [setvariablegroup]
-      executeLoadDataTests: ${{parameters.executeLoadDataTests}}
-      installGremlin: ${{parameters.installGremlin}}
-      runTests: ${{parameters.runTests}}
+      - template: ./coreresources.yml
+        parameters:
+          firstrun: ${{parameters.firstrun}}
+          secondary: ${{parameters.secondary}}
+          primary: true
+          variableGroup: 'VariableGroupYML'
+          envName: primary    
+          database: ${{parameters.database}} 
+          cleanAks: ${{parameters.cleanAks}}
+          dependsOn: [setvariablegroup]
+          executeLoadDataTests: ${{parameters.executeLoadDataTests}}
+          installGremlin: ${{parameters.installGremlin}}
+          runTests: ${{parameters.runTests}}
     
     
