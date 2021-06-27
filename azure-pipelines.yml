@@ -10,6 +10,11 @@ parameters:
 - name: groupdesc
   type: string
   default: 'hi all'
+  
+- name: envName
+  displayName: environment Name
+  type: string
+  default: primary
 
 - name: variablename
   type: string
