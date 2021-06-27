@@ -17,7 +17,7 @@ steps:
   - task: PowerShell@2
     displayName: "Generating \"${{ replace(template.templateFile, '.json', '.params.json') }}\""
     inputs:
-      filePath: pipelines/scripts/GenerateArmParamsFile.ps1
+      filePath: ./GenerateArmParamsFile.ps1
       arguments: >-
         -TemplateFile '${{ template.templateFile }}'
         -OutputDirectory '${{ parameters.outputDirectory }}'
