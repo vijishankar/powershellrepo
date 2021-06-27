@@ -1,0 +1,295 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "0.1.0.0",
+  "parameters": {
+    "isDr": {
+      "type": "string"
+    },
+    "crName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the container registry."
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the KeyVault."
+      }
+    },
+    "keyVaultSku": {
+      "type": "string",
+      "allowedValues": [ "Standard", "Premium" ],
+      "defaultValue": "Premium"
+    },
+    "keyVaultUsers": {
+      "type": "array",
+      "metadata": {
+        "description": "The AAD object ids of the users to grant admin permisions to the keyvault."
+      }
+    },
+    "KeyVaultSecrets": {
+      "type": "secureobject",
+      "metadata": {
+        "description": "Secrets to inject into keyvault"
+      },
+      "defaultValue": {
+        "secrets": [
+        ]
+      }
+    },
+    "laWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name for the log analytics workspace"
+      }
+    },
+    "laWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name for the log analytics workspace"
+      }
+    },
+    "ApplicationInsightsName": {
+      "type": "string",
+      "defaultValue": "ApplicationInsights",
+      "metadata": {
+        "description": "The name for ApplicationInsights"
+      }
+    },
+    "AzureConnection": {
+      "type": "string",
+      "defaultValue": "CTS Team"
+    },
+    "solution": {
+      "type": "string"
+    },
+    "create_date": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy-MM-dd')]"
+    },
+    "environmentClass": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "standardTags":{
+      "Creator": "[parameters('AzureConnection')]",
+      "Date": "[parameters('create_date')]",
+      "Solution": "[parameters('solution')]",
+      "EnvironmentClass": "[parameters('environmentClass')]"
+    },
+    "crName": "[parameters('crName')]",
+    "secrets": "[if(or(empty(parameters('KeyVaultSecrets')), empty(parameters('KeyVaultSecrets').secrets)), json('[]'), parameters('KeyVaultSecrets').secrets)]" 
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/tags",
+      "name": "default",
+      "apiVersion": "2019-10-01",
+      "dependsOn": [],
+      "properties": {
+        "tags":  "[union(variables('standardTags'),json('{\"ResourceType\":\"RG\"}'))]"
+      }
+    },
+    {
+      "condition": "[equals(toLower(parameters('isDr')), 'false')]",
+      "name": "[variables('crName')]",
+      "comments": "Container Registry - Premium required for image signing",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "sku": {
+        "name": "Premium"
+      },
+      "apiVersion": "2019-05-01",
+      "location": "[variables('location')]",
+      "tags":  "[union(variables('standardTags'),json('{\"ResourceType\":\"ACR\"}'))]",
+      "properties": {
+        "adminUserEnabled": false,
+        "networkRuleSet": {
+          "defaultAction": "Deny",
+          "ipRules": [
+          ]
+        },
+        "policies": {
+          "trustPolicy": {
+            "type": "Notary",
+            "status": "enabled"
+          }
+        }
+      }
+    },
+    {
+      "condition": "[equals(toLower(parameters('isDr')), 'false')]",
+      "type": "Microsoft.ContainerRegistry/registries/providers/diagnosticSettings",
+      "name": "[concat(variables('crName'),'/microsoft.insights/system')]",
+      "dependsOn": [
+        "[variables('crName')]"
+      ],
+      "apiVersion": "2017-05-01-preview",
+      "properties": {
+        "name": "system",
+        "workspaceId": "[resourceid(parameters('laWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces', parameters('laWorkspaceName'))]",
+        "logs": [
+          {
+            "category": "ContainerRegistryRepositoryEvents",
+            "enabled": true
+          },
+          {
+            "category": "ContainerRegistryLoginEvents",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[parameters('keyVaultName')]",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location')]",
+      "tags":  "[union(variables('standardTags'),json('{\"ResourceType\":\"Key Vault\"}'))]",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enableSoftDelete": true,
+        "enablePurgeProtection": true,
+        "softDeleteRetentionInDays": 90,
+        "copy": [
+          {
+            "name": "accessPolicies",
+            "count": "[length(parameters('keyVaultUsers'))]",
+            "input": {
+              "objectId": "[parameters('keyVaultUsers')[copyIndex('accessPolicies')]]",
+              "tenantId": "[subscription().tenantId]",
+              "permissions": {
+                "keys": [
+                  "get",
+                  "list",
+                  "update",
+                  "create",
+                  "import",
+                  "delete",
+                  "recover",
+                  "backup",
+                  "restore"
+                ],
+                "secrets": [
+                  "get",
+                  "list",
+                  "set",
+                  "delete",
+                  "recover",
+                  "backup",
+                  "restore"
+                ],
+                "certificates": [
+                  "get",
+                  "list",
+                  "update",
+                  "create",
+                  "import",
+                  "delete",
+                  "recover",
+                  "managecontacts",
+                  "manageissuers",
+                  "getissuers",
+                  "listissuers",
+                  "setissuers",
+                  "deleteissuers"
+                ]
+              }
+            }
+          }
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "[parameters('KeyVaultSku')]",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+          ],
+          "ipRules": [
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2019-09-01",
+      "metadata": {
+        "comment": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/copy-resources#copy-limits"
+      },
+      "name": "[concat(parameters('keyVaultName'),'/', if(empty(variables('secrets')), 'dummy', variables('secrets')[copyIndex('secretsCopy')].name))]",
+      "dependsOn": [
+        "[parameters('keyVaultName')]"
+      ],
+      "condition": "[not(empty(variables('secrets')))]",
+      "properties": {
+        "value": "[variables('secrets')[copyIndex('secretsCopy')].value]",
+        "contentType": "Deployment secret"
+      },
+      "copy": {
+        "name": "secretsCopy",
+        "count": "[length(variables('secrets'))]",
+        "mode": "parallel"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/diagnosticSettings",
+      "name": "[concat(parameters('keyVaultName'),'/microsoft.insights/system')]",
+      "dependsOn": [
+        "[parameters('keyVaultName')]"
+      ],
+      "apiVersion": "2017-05-01-preview",
+      "properties": {
+        "name": "system",
+        "workspaceId": "[resourceid(parameters('laWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces', parameters('laWorkspaceName'))]",
+        "logs": [
+          {
+            "category": "AuditEvent",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "comments": "Application Insights",
+      "name": "[parameters('ApplicationInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[variables('location')]",
+      "tags":  "[union(variables('standardTags'),json('{\"ResourceType\":\"Application Insights\"}'))]",
+      "kind": "other",
+      "apiVersion": "2018-05-01-preview",
+      "properties": {
+        "ApplicationId": "[parameters('applicationInsightsName')]",
+        "Application_Type": "other",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest",
+        "SamplingPercentage": "15",
+        "RetentionInDays": "30"
+      }
+    }
+  ],
+  "outputs": {
+    "KeyVaultId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+    }
+  }
+}
