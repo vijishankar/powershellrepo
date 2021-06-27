@@ -52,18 +52,6 @@ stages:
         templates:
         - templateFile: core-resources.json
           resourceGroup: $(coreResourceGroup)
-        - templateFile: automation.json
-          resourceGroup: $(coreResourceGroup)
-        - ${{ if eq(parameters.secondary, true) }}:  
-          - templateFile: acrDR.json
-            resourceGroup: $(originCoreResourceGroup)
-            location: $(location)
-        - ${{ if eq(parameters.envName, 'primary') }}:
-          - templateFile: artifact-storage.json
-            resourceGroup: $(coreResourceGroup)
-          - ${{ if variables.subscriptionDiagnosticsEnabled }}:
-            - templateFile: diagnostics-subscription.json
-              resourceGroup: $(coreResourceGroup)
         prefix: core
         outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
 
@@ -76,4 +64,4 @@ stages:
     - task: PublishPipelineArtifact@1
       inputs:
         artifactName: 'pre-provision-scripts${{ parameters.envName }}'
-        path: $(Build.Repository.LocalPath)/pipelines/scripts/                             
+        path: $(Build.Repository.LocalPath)/
