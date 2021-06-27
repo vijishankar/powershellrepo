@@ -1,0 +1,79 @@
+parameters:
+- name: firstrun
+  displayName: Import images from CTSDev registry ?
+  type: boolean
+  default: false
+- name: solution
+  displayName: Solution
+  type: string
+  default: fcmsaas
+
+- name: primary
+  displayName: Are you deploying a primary region?
+  type: boolean
+  default: false
+
+- name: secondary
+  displayName: Are you deploying a secondary region?
+  type: boolean
+  default: false
+
+- name: variableGroup
+  displayName: Variable Group to use
+  type: string
+  default: ""
+  
+- name: envName
+  displayName: environment Name
+  type: string
+  default: primary
+
+- name: dependsOn
+  type: object
+  default: []
+
+- name: runTests
+  displayName: Run IAAC Tests ?
+  type: boolean
+  default: false
+stages:
+- stage: DeployCore_${{ parameters.envName }}
+  dependsOn: ${{parameters.dependsOn}}
+  ${{ if ne(parameters.variableGroup,'' )}}:
+    variables:
+    - group: ${{ parameters.variableGroup }}
+  displayName: 'Core Resources ${{ parameters.envName }}'
+  jobs:
+  - job: templates
+    displayName: 'Generate the ARM templates.'
+    steps:
+    - template: ./arm-params-validate.yml
+      parameters:
+        templates:
+        - templateFile: core-resources.json
+          resourceGroup: $(coreResourceGroup)
+        - templateFile: automation.json
+          resourceGroup: $(coreResourceGroup)
+        - ${{ if eq(parameters.secondary, true) }}:  
+          - templateFile: acrDR.json
+            resourceGroup: $(originCoreResourceGroup)
+            location: $(location)
+        - ${{ if eq(parameters.envName, 'primary') }}:
+          - templateFile: artifact-storage.json
+            resourceGroup: $(coreResourceGroup)
+          - ${{ if variables.subscriptionDiagnosticsEnabled }}:
+            - templateFile: diagnostics-subscription.json
+              resourceGroup: $(coreResourceGroup)
+        prefix: core
+        outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'pre-provision-templates${{ parameters.envName }}'
+        path: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'pre-provision-scripts${{ parameters.envName }}'
+        path: $(Build.Repository.LocalPath)/pipelines/scripts/                             
