@@ -4,10 +4,6 @@
 #3. shared infrastructure
 #4. Transact / FMC / Analytics
 #5. cleanup / tests
-trigger: none
-
-pool:
-  vmImage: windows-latest
 
 parameters:
 - name: database
