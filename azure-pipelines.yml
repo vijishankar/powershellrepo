@@ -34,14 +34,14 @@ jobs:
               -organization $(System.CollectionUri)
               -project $(System.TeamProject)
  
- - job: templates
-    displayName: 'Generate the ARM templates.'
-    steps:
-    - template: ./arm-params-validate.yml
-      parameters:
-        templates:
-        - templateFile: core-resources.json
-          resourceGroup: $(coreResourceGroup)
-        prefix: core
-        outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+  - job: templates
+     displayName: 'Generate the ARM templates.'
+     steps:
+     - template: ./arm-params-validate.yml
+       parameters:
+         templates:
+         - templateFile: core-resources.json
+           resourceGroup: $(coreResourceGroup)
+         prefix: core
+         outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
  
