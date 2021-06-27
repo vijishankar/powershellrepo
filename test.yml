@@ -1,0 +1,71 @@
+#Transact + FCM + Analytics
+#1. core
+#2. ingress
+#3. shared infrastructure
+#4. Transact / FMC / Analytics
+#5. cleanup / tests
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+parameters:
+- name: database
+  displayName: Database
+  type: string
+  default: SQLMI
+  values:
+  - NuoDB
+  - SQLMI
+
+- name: primary
+  displayName: Deploy a primary region ?
+  type: boolean
+  default: true
+
+- name: secondary
+  displayName: Are you deploying a secondary region?
+  type: boolean
+  default: false
+
+- name: firstrun
+  displayName: Import docker images from Source Registry ?
+  type: boolean
+  default: false
+
+- name: cleanAks
+  displayName: Clean AKS from DB and FCM and Transact?
+  type: boolean
+  default: false
+
+- name: executeLoadDataTests
+  displayName: Execute load data and load data tests?
+  type: boolean
+  default: false
+
+- name: installGremlin
+  displayName: Install Gremlin into AKS?
+  type: boolean
+  default: false
+
+- name: runTests
+  displayName: Run IAAC Tests ?
+  type: boolean
+  default: true
+
+stages:
+
+- ${{if eq(parameters.primary, true)}}:
+  - template: ./coreresources.yml
+    parameters:
+      firstrun: ${{parameters.firstrun}}
+      secondary: ${{parameters.secondary}}
+      primary: true
+      variableGroup: 'VariableGroupYML'
+      envName: primary    
+      database: ${{parameters.database}} 
+      cleanAks: ${{parameters.cleanAks}}
+      dependsOn: [setvariablegroup]
+      executeLoadDataTests: ${{parameters.executeLoadDataTests}}
+      installGremlin: ${{parameters.installGremlin}}
+      runTests: ${{parameters.runTests}}
