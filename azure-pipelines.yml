@@ -40,30 +40,6 @@ jobs:
               -project $(System.TeamProject)
  
   
-  - ${{if eq(parameters.primary, true)}}:
-  - template: ./skinnysaas.region.yml
-    parameters:
-      firstrun: ${{parameters.firstrun}}
-      secondary: ${{parameters.secondary}}
-      primary: true
-      variableGroup: 'CTS - Skinny SaaS test'
-      envName: primary    
-      database: ${{parameters.database}} 
-      cleanAks: ${{parameters.cleanAks}}
-      dependsOn: [setvariablegroup]
-      executeLoadDataTests: ${{parameters.executeLoadDataTests}}
-      installGremlin: ${{parameters.installGremlin}}
-      runTests: ${{parameters.runTests}}
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   - job: templates
     steps:
     - template: ./test.yml
