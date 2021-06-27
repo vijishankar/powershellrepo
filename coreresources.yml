@@ -79,29 +79,6 @@ parameters:
   - 5Users_200FT
 
 stages:
-- ${{ if eq(parameters.runTests, true)}}: 
-  - stage: helperValidate_${{ parameters.envName }}
-    dependsOn: ${{ parameters.dependsOn }}
-    ${{ if ne(parameters.variableGroup,'' )}}:
-      variables:
-      - group: ${{ parameters.variableGroup }}
-    displayName: "IntegrationTesting: helper validate ${{ parameters.envName }}"
-    pool:
-      vmImage: ubuntu-latest
-    jobs:
-    - job: triggertests
-      displayName: "Trigger helper test"
-      steps: 
-      - bash: |
-          mkdir -m 777 -p $(Pipeline.Workspace)/gotests
-          cp -r $(Build.SourcesDirectory)/test/gotests/** $(Pipeline.Workspace)/gotests
-        displayName: 'Get source code for helper validate'
-        failOnStderr: false
-      - template: ../templates/integrationtesting.yml
-        parameters:        
-          tags: helper
-          target: helper
-
 #core resources
 - template: './core.stages.yml'
   parameters:
