@@ -57,4 +57,4 @@ jobs:
     - task: PublishPipelineArtifact@1
       inputs:
         artifactName: 'pre-provision-scripts${{ parameters.envName }}'
-        path: $(Build.Repository.LocalPath)/pipelines/scripts/    
+        path: $(Build.Repository.LocalPath)/
