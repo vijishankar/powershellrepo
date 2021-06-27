@@ -26,15 +26,3 @@ steps:
         -appPrefix '${{ template.prefix }}'
       pwsh: true
       ignoreLASTEXITCODE: true
-
-  - ${{ if not(template.skipArmValidation) }}:
-    - task: AzureResourceManagerTemplateDeployment@3
-      displayName: "Validating \"${{ template.templateFile }}\""
-      inputs:
-        deploymentScope: "Resource Group"
-        ConnectedServiceName: $(AzureConnection)
-        resourceGroupName: ${{ template.resourceGroup }}
-        location: $(location)
-        csmFile: '$(ArmTemplateFile)'
-        csmParametersFile: '$(ArmTemplateParametersFile)'
-        deploymentMode: "Validation"
