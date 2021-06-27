@@ -39,22 +39,33 @@ jobs:
               -organization $(System.CollectionUri)
               -project $(System.TeamProject)
  
+  
+  - ${{if eq(parameters.primary, true)}}:
+  - template: ./skinnysaas.region.yml
+    parameters:
+      firstrun: ${{parameters.firstrun}}
+      secondary: ${{parameters.secondary}}
+      primary: true
+      variableGroup: 'CTS - Skinny SaaS test'
+      envName: primary    
+      database: ${{parameters.database}} 
+      cleanAks: ${{parameters.cleanAks}}
+      dependsOn: [setvariablegroup]
+      executeLoadDataTests: ${{parameters.executeLoadDataTests}}
+      installGremlin: ${{parameters.installGremlin}}
+      runTests: ${{parameters.runTests}}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   - job: templates
     steps:
-    - template: ./arm-params-validate.yml
-      parameters:
-        templates:
-        - templateFile: core-resources.json
-          resourceGroup: $(coreResourceGroup)
-        prefix: core
-        outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+    - template: ./test.yml
  
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: 'pre-provision-templates${{ parameters.envName }}'
-        path: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: 'pre-provision-scripts${{ parameters.envName }}'
-        path: $(Build.Repository.LocalPath)/
+    
