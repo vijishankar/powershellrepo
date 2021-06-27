@@ -1,0 +1,118 @@
+
+parameters:
+- name: database
+  displayName: Database
+  type: string
+  default: SQLMI
+  values:
+  - NuoDB
+  - SQLMI
+- name: solution
+  displayName: Solution
+  type: string
+  default: fullsaas
+
+- name: secondary
+  displayName: Are you deploying a secondary region?
+  type: boolean
+  default: false
+
+- name: primary
+  displayName: Are you deploying a primary region?
+  type: boolean
+  default: false
+
+- name: envName
+  displayName: Environment name (primary, secondary)
+  type: string
+  default: primary
+  values:
+  - primary
+  - secondary
+
+- name: variableGroup
+  displayName: Variable Group used for this region
+  type: string
+  default: ""
+
+- name: firstrun
+  displayName: Import docker images from Source Registry ?
+  type: boolean
+  default: false
+
+- name: cleanAks
+  displayName: clean aks Db and fcm and transact
+  type: boolean
+  default: false
+
+- name: dependsOn
+  type: object
+  default: []
+
+- name: executeLoadDataTests
+  displayName: Execute load data and load data tests?
+  type: boolean
+  default: false
+
+- name: installGremlin
+  displayName: Install Gremlin into AKS?
+  type: boolean
+  default: false
+
+- name: runTests
+  displayName: Run IAAC Tests ?
+  type: boolean
+  default: false
+  
+- name: baseTransactionID
+  displayName: Base Transaction starting ID (values 10 to 99 - this would be multiplied by 1000)
+  type: number
+  default: 10
+
+- name: loadFTTestType
+  displayName: FT Test Type
+  type: string
+  default: 5Users_20FT
+  values:
+  - 5Users_5FT
+  - 5Users_20FT
+  - 5Users_200FT
+
+stages:
+- ${{ if eq(parameters.runTests, true)}}: 
+  - stage: helperValidate_${{ parameters.envName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    ${{ if ne(parameters.variableGroup,'' )}}:
+      variables:
+      - group: ${{ parameters.variableGroup }}
+    displayName: "IntegrationTesting: helper validate ${{ parameters.envName }}"
+    pool:
+      vmImage: ubuntu-latest
+    jobs:
+    - job: triggertests
+      displayName: "Trigger helper test"
+      steps: 
+      - bash: |
+          mkdir -m 777 -p $(Pipeline.Workspace)/gotests
+          cp -r $(Build.SourcesDirectory)/test/gotests/** $(Pipeline.Workspace)/gotests
+        displayName: 'Get source code for helper validate'
+        failOnStderr: false
+      - template: ../templates/integrationtesting.yml
+        parameters:        
+          tags: helper
+          target: helper
+
+#core resources
+- template: './core.stages.yml'
+  parameters:
+    ${{ if eq(parameters.runTests, true)}}: 
+      dependsOn: ["helperValidate_${{ parameters.envName }}"]
+    ${{ if eq(parameters.runTests, false)}}:
+      dependsOn: ${{ parameters.dependsOn }} 
+    firstrun: ${{ parameters.firstrun }}
+    primary: ${{ parameters.primary }}
+    secondary: ${{ parameters.secondary }}
+    variableGroup: ${{ parameters.variableGroup }}
+    envName: ${{ parameters.envName }}
+    solution: ${{parameters.solution}}
+    runTests: ${{parameters.runTests}}
