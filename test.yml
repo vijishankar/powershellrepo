@@ -49,8 +49,8 @@ parameters:
   type: boolean
   default: true
 
-jobs:
-  - job: template
+stages:
+- stage: DeployCore
 - ${{if eq(parameters.primary, true)}}:
   - template: ./coreresources.yml
     parameters:
