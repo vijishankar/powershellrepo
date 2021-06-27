@@ -17,6 +17,7 @@ parameters:
   type: boolean
   default: false
 
+
 - name: primary
   displayName: Are you deploying a primary region?
   type: boolean
