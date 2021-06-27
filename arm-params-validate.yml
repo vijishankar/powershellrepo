@@ -1,0 +1,40 @@
+parameters:
+- name: templates
+  type: object
+  default: []
+- name: keyVaultId
+  type: string
+  default: ''
+- name: outputDirectory
+  type: string
+  default: 'templates'
+- name: prefix
+  type: string
+  default: ''
+
+steps:
+- ${{ each template in parameters.templates }}:
+  - task: PowerShell@2
+    displayName: "Generating \"${{ replace(template.templateFile, '.json', '.params.json') }}\""
+    inputs:
+      filePath: pipelines/scripts/GenerateArmParamsFile.ps1
+      arguments: >-
+        -TemplateFile '${{ template.templateFile }}'
+        -OutputDirectory '${{ parameters.outputDirectory }}'
+        -KeyVaultId '${{ parameters.keyVaultId }}'
+        -pipelinePrefix '${{ parameters.prefix }}'
+        -appPrefix '${{ template.prefix }}'
+      pwsh: true
+      ignoreLASTEXITCODE: true
+
+  - ${{ if not(template.skipArmValidation) }}:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: "Validating \"${{ template.templateFile }}\""
+      inputs:
+        deploymentScope: "Resource Group"
+        ConnectedServiceName: $(AzureConnection)
+        resourceGroupName: ${{ template.resourceGroup }}
+        location: $(location)
+        csmFile: '$(ArmTemplateFile)'
+        csmParametersFile: '$(ArmTemplateParametersFile)'
+        deploymentMode: "Validation"
