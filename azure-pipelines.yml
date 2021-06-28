@@ -20,52 +20,6 @@ parameters:
   type: string
   default: 'Devops'
 
-- name: variablevalue
-  type: string
-  default: 'Joe'
-- name: database
-  displayName: Database
-  type: string
-  default: SQLMI
-  values:
-  - NuoDB
-  - SQLMI
-
-- name: primary
-  displayName: Deploy a primary region ?
-  type: boolean
-  default: true
-
-- name: secondary
-  displayName: Are you deploying a secondary region?
-  type: boolean
-  default: false
-
-- name: firstrun
-  displayName: Import docker images from Source Registry ?
-  type: boolean
-  default: false
-
-- name: cleanAks
-  displayName: Clean AKS from DB and FCM and Transact?
-  type: boolean
-  default: false
-
-- name: executeLoadDataTests
-  displayName: Execute load data and load data tests?
-  type: boolean
-  default: false
-
-- name: installGremlin
-  displayName: Install Gremlin into AKS?
-  type: boolean
-  default: false
-
-- name: runTests
-  displayName: Run IAAC Tests ?
-  type: boolean
-  default: true
-
 jobs:
   - job: creating_group
     steps:
@@ -84,19 +38,22 @@ jobs:
   
   - job: templates
     steps:
-    - ${{if eq(parameters.primary, true)}}:
-      - template: ./coreresources.yml
-        parameters:
-          firstrun: ${{parameters.firstrun}}
-          secondary: ${{parameters.secondary}}
-          primary: true
-          variableGroup: 'VariableGroupYML'
-          envName: primary    
-          database: ${{parameters.database}} 
-          cleanAks: ${{parameters.cleanAks}}
-          dependsOn: [setvariablegroup]
-          executeLoadDataTests: ${{parameters.executeLoadDataTests}}
-          installGremlin: ${{parameters.installGremlin}}
-          runTests: ${{parameters.runTests}}
+    - template: ./arm-params-validate.yml
+      parameters:
+        templates:
+        - templateFile: core-resources.json
+          resourceGroup: $(coreResourceGroup)
+        prefix: core
+        outputDirectory: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+ 
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'pre-provision-templates${{ parameters.envName }}'
+        path: $(Build.StagingDirectory)/templates${{ parameters.envName }}/
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'pre-provision-scripts${{ parameters.envName }}'
+        path: $(Build.Repository.LocalPath)/
     
     
