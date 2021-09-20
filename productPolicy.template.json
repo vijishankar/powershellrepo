@@ -18,7 +18,7 @@
 			"name": "[concat(parameters('apiManagementServiceName'), '/', parameters('apiName'), '/policy')]",
 			"apiVersion": "[variables('apiVersion')]",
 			"properties": {
-				"policyContent": "<policies>\r\n  <inbound>\r\n <validate-jwt header-name=\"Token\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized\">\r\n   <issuer-signing-keys>\r\n  <key>c2VydmljZWZhYnJpY3NlY3JldGtleQ==</key>\r\n  </issuer-signing-keys>\r\n </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
+				"policyContent": "<policies>\r\n  <inbound>\r\n <validate-jwt header-name=\"Token\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized\">\r\n   <issuer-signing-keys>\r\n  <key>d29ybGR2aXNpb25kZXZvcHM=</key>\r\n  </issuer-signing-keys>\r\n </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
 			},
 			"dependsOn": []
 		}
